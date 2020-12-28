@@ -1,0 +1,40 @@
+version: "3.8"
+services:
+  frontend:
+    build: "./frontend"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "8000:8000"
+    expose:
+      - 8000
+    depends_on:
+      - strapi
+    tty: true
+    stdin_open: true
+
+  strapi:
+    image: strapi/strapi
+    environment:
+      DATABASE_CLIENT: mongo
+      DATABASE_NAME: strapi
+      DATABASE_HOST: mongo
+      DATABASE_PORT: 27017
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: strapi
+    volumes:
+      - ./backend/app:/srv/app
+    ports:
+      - "1337:1337"
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_DATABASE: strapi
+      MONGO_INITDB_ROOT_USERNAME: strapi
+      MONGO_INITDB_ROOT_PASSWORD: strapi
+    volumes:
+      - ./backend/data:/data/db
